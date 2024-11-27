@@ -22,4 +22,4 @@ Rewritten from [JS](https://github.com/Hkmori15/Larium)
 - [x] Add command /info for providing information about anime.
 - [x] Add autoremove anime from database when it's stop be ongoing.
 - [x] Find better API for anime searching and info.
-- [] Find a better way to check the release of an anime episodes (Cant find a way to fast check the release of an anime episode, idk how to do it).
+- [ ] Find a better way to check the release of an anime episodes (Cant find a way to fast check the release of an anime episode, idk how to do it).
