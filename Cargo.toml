@@ -1,6 +1,6 @@
 [package]
 name = "larium-rs"
-version = "0.1.0"
+version = "0.1.1"
 description = "Telegram bot for notification about new episode anime"
 authors = ["Hkmori15"]
 repository = "https://github.com/Hkmori15/Larium-rs"

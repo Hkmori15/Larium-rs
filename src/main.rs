@@ -9,6 +9,7 @@ use futures::TryStreamExt;
 
 mod mongodb;
 mod api;
+mod keep_alive;
 
 #[derive(BotCommands, Clone)]
 #[command(rename_rule = "lowercase")]
@@ -24,6 +25,7 @@ enum Command {
 async fn main() -> Result<(), Box<dyn Error>> {
     dotenv().ok();
     pretty_env_logger::init();
+    keep_alive::keep_alive();
 
     let bot = Bot::new(std::env::var("TELOXIDE_TOKEN")?);
     let mongo_uri = std::env::var("MONGODB_URI")?;
