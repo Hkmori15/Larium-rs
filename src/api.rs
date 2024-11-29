@@ -19,12 +19,18 @@ pub struct AnimeResponse {
    pub description: Option<String>,
    pub score: Option<String>,
    pub genres: Option<Vec<Genre>>,
+   pub image: ImageData,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Genre {
    pub name: String,
    pub russian: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ImageData {
+   pub original: String,
 }
 
 pub async fn check_anime_exists(anime_name: &str) -> Result<Option<AnimeResponse>, Box<dyn Error + Send + Sync>> {

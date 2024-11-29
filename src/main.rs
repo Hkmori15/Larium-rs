@@ -2,7 +2,7 @@ use std::error::Error;
 use std::time::Duration;
 use dotenvy::dotenv;
 use ::mongodb::{options::ClientOptions, Client, Database};
-use teloxide::{prelude::*, utils::command::BotCommands};
+use teloxide::{prelude::*, types::InputFile, utils::command::BotCommands};
 use tokio;
 use bson::doc;
 use futures::TryStreamExt;
@@ -99,6 +99,8 @@ async fn answer(
 
             match anime {
                 Some(anime) => {
+                    let poster_url = format!("https://shikimori.one{}", anime.image.original);
+
                     let genres = anime.genres
                         .as_ref()
                         .map(|genres| {
@@ -110,20 +112,23 @@ async fn answer(
                         })
                         .unwrap_or_else(|| "Жанры не указаны".to_string());
 
+
                     let info_message = format!(
-                        "Информация об аниме \"{}\":\n\
-                        Количество серий: {}\n\
-                        Жанры: {}\n\
-                        Описание: {}\n\
+                        "Информация об аниме: \"{}\"\n\n\
+                        Количество серий: {}\n\n\
+                        Жанры: {}\n\n\
+                        Описание: {}\n\n\
                         Рейтинг: {}",
                         anime.russian.unwrap_or(anime.name),
                         anime.episodes.map_or("Неизвестно".to_string(), |e| e.to_string()),
                         genres,
-                        anime.description.unwrap_or_else(|| "Описание отсутсвует".to_string()),
+                        anime.description.unwrap_or_else(|| "Описание отсутствует".to_string()),
                         anime.score.map_or("Нет рейтинга".to_string(), |s| s.to_string())
                     );
 
-                    bot.send_message(msg.chat.id, info_message).await?;
+                    bot.send_photo(msg.chat.id, InputFile::url(poster_url.parse()?))
+                        .caption(info_message)
+                        .await?;
                 }
 
                 None => {
@@ -144,6 +149,24 @@ async fn answer(
             match anime {
                 Some(anime) => {
                     let collection = db.collection::<mongodb::Subscription>("subscriptions");
+
+                    // Check if subs already exists
+                    let existing = collection
+                        .find_one(doc! {
+                            "user_id": user_id,
+                            "anime_id": anime.id
+                        })
+                        .await?;
+
+                    if existing.is_some() {
+                        bot.send_message(
+                            msg.chat.id,
+                            "Вы уже подписаны на это аниме."
+                        ).await?;
+
+                        return Ok(())
+                    }
+
                     let subscription = mongodb::Subscription {
                         user_id,
                         anime_id: anime.id,
